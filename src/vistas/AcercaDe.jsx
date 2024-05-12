@@ -5,7 +5,7 @@ export function AcercaDe (){
     return(
 
         <>
-        <h1>Vista About</h1>
+        <h1>Vista AcercaDe</h1>
         </>
     )
 }
