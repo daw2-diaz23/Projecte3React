@@ -1,15 +1,33 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import React, { useState } from 'react';
+import './App.css';
+import { Juego } from './vistas/Juego';
+import { Header } from './componentes/header';
 
-function App() {
-  const [count, setCount] = useState(0)
+import { GrupoTarjetas } from './componentes/GrupoTarjetas';
+import { GlobalClicksProvider , TotalClicksCounter } from './context/Globalclics';
+
+
+
+
+
+
+export default function App() {
+  const [count, setCount] = useState(0);
 
   return (
-    <h1 className="text-3xl font-bold underline">
-    Hello world!
-  </h1>
-  )
+    <div>
+      
+      
+      <GlobalClicksProvider>
+      <div>
+        <Header />
+        <Juego />
+        <TotalClicksCounter />
+        <GrupoTarjetas />
+      </div>
+    </GlobalClicksProvider>
+  
+      
+    </div>
+  );
 }
-
-export default App
