@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
 import './App.css';
 import { Juego } from './vistas/Juego';
+import { AcercaDe } from './vistas/AcercaDe';
+import { Home } from './vistas/Home'
 import { Header } from './componentes/header';
-
-import { GrupoTarjetas } from './componentes/GrupoTarjetas';
-import { GlobalClicksProvider , TotalClicksCounter } from './context/Globalclics';
-
-
-
-
+import { Route, Routes } from 'react-router-dom';
 
 
 export default function App() {
@@ -16,16 +12,20 @@ export default function App() {
 
   return (
     <div>
+       
+      <Header />
+      <Routes>
+        <Route path='/' element={<Home />}></Route>
+        <Route path='/acercade' element={<AcercaDe />}></Route>
+        <Route path='/juego' element={<Juego />} />
+      </Routes>
+ 
+       
       
+        
+        
       
-      <GlobalClicksProvider>
-      <div>
-        <Header />
-        <Juego />
-        <TotalClicksCounter />
-        <GrupoTarjetas />
-      </div>
-    </GlobalClicksProvider>
+    
   
       
     </div>
