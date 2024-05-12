@@ -3,7 +3,7 @@ import './App.css';
 import { Juego } from './vistas/Juego';
 import { AcercaDe } from './vistas/AcercaDe';
 import { Home } from './vistas/Home'
-import { Header } from './componentes/header';
+import { Header } from './componentes/Header';
 import { Route, Routes } from 'react-router-dom';
 
 
