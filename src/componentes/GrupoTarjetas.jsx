@@ -1,117 +1,67 @@
-
-import { Tarjeta } from './Tarjeta'; 
-
-const arrayPersonajes = [
-    {
-      id: 1,
-      nombre: 'Capitan',
-      imagen: 'capitan2.webp'
-    },
-    {
-      id: 2,
-      nombre: 'Pikachu',
-      imagen: 'pikachu.png'
-    },
-    {
-      id: 3,
-      nombre: 'Luigi',
-      imagen: 'luigi.png'
-    },
-    {
-      id: 4,
-      nombre: 'Yoshi',
-      imagen: 'yoshi.png'
-    },
-    {
-      id: 5,
-      nombre: 'Link',
-      imagen: 'link.png'
-    },
-    {
-      id: 6,
-      nombre: 'Zelda',
-      imagen: 'zelda.png'
-    },
-    {
-      id: 7,
-      nombre: 'Donkey Kong',
-      imagen: 'donkey-kong.png'
-    },
-    {
-      id: 8,
-      nombre: 'Samus',
-      imagen: 'samus.png'
-    },
-    {
-      id: 9,
-      nombre: 'Mega Man',
-      imagen: 'mega-man.png'
-    },
-    {
-      id: 10,
-      nombre: 'Spongebob',
-      imagen: 'spongebob.png'
-    },
-    {
-      id: 11,
-      nombre: 'Bart Simpson',
-      imagen: 'bart-simpson.png'
-    },
-    {
-      id: 12,
-      nombre: 'Homer Simpson',
-      imagen: 'homer-simpson.png'
-    },
-    {
-      id: 13,
-      nombre: 'Mickey Mouse',
-      imagen: 'mickey-mouse.png'
-    },
-    {
-      id: 14,
-      nombre: 'Donald Duck',
-      imagen: 'donald-duck.png'
-    },
-    {
-      id: 15,
-      nombre: 'Buzz Lightyear',
-      imagen: 'buzz-lightyear.png'
-    },
-    {
-      id: 16,
-      nombre: 'Woody',
-      imagen: 'woody.png'
-    },
-    {
-      id: 17,
-      nombre: 'Spider-Man',
-      imagen: 'spider-man.png'
-    },
-    {
-      id: 18,
-      nombre: 'Batman',
-      imagen: 'batman.png'
-    },
-    {
-      id: 19,
-      nombre: 'Mario',
-      imagen: 'mario.png'
-    },
-    {
-      id: 20,
-      nombre: 'Sonic',
-      imagen: 'sonic.png'
-    },
-  ];
+import React, { useState, useEffect } from 'react';
+import { Tarjeta } from './Tarjeta';
 
 export function GrupoTarjetas() {
+  const [tarjetas, setTarjetas] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const randomPokemonIds = generateRandomIds(9);
+        const promises = randomPokemonIds.map(id =>
+          fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+            .then(response => response.json())
+            .then(data => ({
+              id: data.id,
+              nombre: data.name,
+              imagen: data.sprites.front_default
+            }))
+        );
+
+        const pokemonData = await Promise.all(promises);
+        
+        // Duplicar la matriz de 9 tarjetas para tener 9 parejas (18 tarjetas)
+        const duplicatedTarjetas = [...pokemonData, ...pokemonData];
+        
+        // Desordenar las tarjetas para que aparezcan en posiciones aleatorias
+        const shuffledTarjetas = shuffleArray(duplicatedTarjetas);
+        
+        setTarjetas(shuffledTarjetas);
+      } catch (error) {
+        console.error('Error fetching Pokemon data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const generateRandomIds = (count) => {
+    const randomIds = [];
+    while (randomIds.length < count) {
+      const id = Math.floor(Math.random() * 898) + 1; // Hay 898 Pokémon en total
+      if (!randomIds.includes(id)) {
+        randomIds.push(id);
+      }
+    }
+    return randomIds;
+  };
+
+  const shuffleArray = (array) => {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  };
+
   return (
     <div className="flex flex-wrap justify-center gap-4">
-      {arrayPersonajes.map((personaje) => (
+      {tarjetas.map((pokemon, index) => (
         <Tarjeta
-          key={personaje.id}
-          nombre={personaje.nombre}
-          imagen={personaje.imagen}
+          key={index}
+          nombre={pokemon.nombre}
+          imagen={pokemon.imagen}
         />
       ))}
     </div>
