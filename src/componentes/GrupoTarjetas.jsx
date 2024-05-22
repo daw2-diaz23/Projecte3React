@@ -9,6 +9,9 @@ export function GrupoTarjetas() {
   const [puntos, setPuntos] = useState(0);
   const [tiempoAgotado, setTiempoAgotado] = useState(false);
   const [tarjetasSeleccionadas, setTarjetasSeleccionadas] = useState([]);
+  const [emparejadas, setEmparejadas] = useState([]);
+  const [resetear, setResetear] = useState(false);
+  const [volteando, setVolteando] = useState(false);
 
   useEffect(() => {
     const fetchPokemonData = async () => {
@@ -44,7 +47,7 @@ export function GrupoTarjetas() {
   const getRandomPokemonIds = (maxId) => {
     const randomIds = [];
     while (randomIds.length < 9) {
-      const id = Math.floor(Math.random() * maxId) + 1;
+      const id = Math.floor(Math.random() * (maxId) + 1);
       if (!randomIds.includes(id)) {
         randomIds.push(id);
       }
@@ -61,18 +64,24 @@ export function GrupoTarjetas() {
     return newArray;
   };
 
-  const manejarApareamiento = (id, nombre, imagen) => {
+  const manejarApareamiento = (id, nombre) => {
     if (tarjetasSeleccionadas.length === 0) {
-      setTarjetasSeleccionadas([{ id, nombre, imagen }]);
+      setTarjetasSeleccionadas([{ id, nombre }]);
     } else if (tarjetasSeleccionadas.length === 1) {
-      const [prevTarjeta] = tarjetasSeleccionadas;
-      if (prevTarjeta.id !== id) {
-        setTarjetasSeleccionadas([...tarjetasSeleccionadas, { id, nombre, imagen }]);
-        if (prevTarjeta.nombre === nombre) {
+      const [primeraTarjeta] = tarjetasSeleccionadas;
+      if (primeraTarjeta.id !== id) {
+        setTarjetasSeleccionadas([...tarjetasSeleccionadas, { id, nombre }]);
+        if (primeraTarjeta.nombre === nombre) {
+          setEmparejadas([...emparejadas, primeraTarjeta.id, id]);
           setPuntos(puntos + 1);
+          setTarjetasSeleccionadas([]);
         } else {
+          setVolteando(true);
           setTimeout(() => {
+            setResetear(true);
             setTarjetasSeleccionadas([]);
+            setVolteando(false);
+            setTimeout(() => setResetear(false), 100);  // Resetear después de 100ms
           }, 1000);
         }
       }
@@ -97,7 +106,8 @@ export function GrupoTarjetas() {
             nombre={tarjeta.nombre}
             imagen={tarjeta.imagen}
             onApareamiento={manejarApareamiento}
-            tarjetasSeleccionadas={tarjetasSeleccionadas}
+            emparejada={emparejadas.includes(tarjeta.id)}
+            resetear={resetear && !emparejadas.includes(tarjeta.id) && !volteando}
           />
         ))}
       </div>

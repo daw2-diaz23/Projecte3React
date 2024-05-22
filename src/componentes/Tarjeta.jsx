@@ -1,57 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { useGlobalClicks } from '../context/Globalclics';
 
-export function Tarjeta({ id, nombre, imagen, onApareamiento }) {
+export function Tarjeta({ id, nombre, imagen, onApareamiento, emparejada, resetear }) {
   const { incrementGlobalClicks } = useGlobalClicks();
   const [contadorClicks, setContadorClicks] = useState(0);
   const [mostrarFrontal, setMostrarFrontal] = useState(false);
-  const [emparejada, setEmparejada] = useState(false);
 
-  const aumentarContador = () => {
-    setContadorClicks(contadorClicks + 1);
-    incrementGlobalClicks();
-    setMostrarFrontal(true);
-    if (!emparejada) {
-      onApareamiento(nombre, imagen);
+  const manejarClick = () => {
+    if (!mostrarFrontal && !emparejada) {
+      setContadorClicks(contadorClicks + 1);
+      setMostrarFrontal(true);
+      onApareamiento(id, nombre);
+      incrementGlobalClicks();
     }
   };
 
   useEffect(() => {
     if (emparejada) {
       setMostrarFrontal(true);
-    } else {
-      const timeoutId = setTimeout(() => {
-        setMostrarFrontal(false);
-      }, 1000);
-      return () => clearTimeout(timeoutId);
+    } else if (resetear) {
+      setMostrarFrontal(false);
     }
-  }, [emparejada]);
-
-  const manejarEmparejamiento = () => {
-    setEmparejada(true);
-  };
-
-  useEffect(() => {
-    if (emparejada) {
-      setMostrarFrontal(true);
-    }
-  }, [emparejada]);
-
-  useEffect(() => {
-    if (!emparejada && mostrarFrontal) {
-      // Si la tarjeta no está emparejada pero se está mostrando,
-      // se restablece su estado después de 1 segundo
-      const timeoutId = setTimeout(() => {
-        setMostrarFrontal(false);
-      }, 1000);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [emparejada, mostrarFrontal]);
+  }, [emparejada, resetear]);
 
   return (
     <div
       className={`bg-slate-200 rounded w-[225px] h-[300px] border p-2 shadow-lg text-center ${emparejada ? 'emparejada' : ''}`}
-      onClick={!mostrarFrontal ? aumentarContador : undefined}
+      onClick={manejarClick}
     >
       <p>Clicks: {contadorClicks}</p>
       {mostrarFrontal || emparejada ? (
@@ -60,7 +35,7 @@ export function Tarjeta({ id, nombre, imagen, onApareamiento }) {
           <h2 className="pt-1">{nombre}</h2>
         </>
       ) : (
-        <img className="h-[250px]" src="pokebola.png" alt="fotocara" />
+        <img className="h-[250px]" src="pokebola.png" alt="pokebola" />
       )}
     </div>
   );
