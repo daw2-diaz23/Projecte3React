@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 import { Tarjeta } from './Tarjeta';
 import { useGlobalClicks } from '../context/Globalclics';
 import { ContadorTiempo } from './ContadorTiempo';
+
+const MySwal = withReactContent(Swal);
 
 export function GrupoTarjetas() {
   const { incrementGlobalClicks } = useGlobalClicks();
@@ -44,6 +48,19 @@ export function GrupoTarjetas() {
 
     fetchPokemonData();
   }, []);
+
+  useEffect(() => {
+    if (emparejadas.length === tarjetas.length && juegoIniciado && !tiempoAgotado) {
+      MySwal.fire({
+        title: '¡Has ganado!',
+        text: '¡Felicidades! Has encontrado todos los pares.',
+        icon: 'success',
+        confirmButtonText: 'Jugar de nuevo'
+      }).then(() => {
+        window.location.reload();
+      });
+    }
+  }, [emparejadas, tarjetas.length, juegoIniciado, tiempoAgotado]);
 
   const getRandomPokemonIds = (maxId, count) => {
     const randomIds = [];
@@ -97,6 +114,14 @@ export function GrupoTarjetas() {
 
   const handleTiempoAgotado = () => {
     setTiempoAgotado(true);
+    MySwal.fire({
+      title: '¡Tiempo agotado!',
+      text: 'Has perdido. Inténtalo de nuevo.',
+      icon: 'error',
+      confirmButtonText: 'Jugar de nuevo'
+    }).then(() => {
+      window.location.reload();
+    });
   };
 
   return (
