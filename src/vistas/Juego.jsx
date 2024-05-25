@@ -5,9 +5,13 @@ import { GlobalClicksProvider, TotalClicksCounter } from '../context/Globalclics
 export function Juego() {       
     return(          
         <div id="home" className="mt-4">             
-            <h1 className="text-2xl  mb-2 text-center">POKEMONS MEMORY</h1>
+            <h1 className="text-5xl font-extrabold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 drop-shadow-lg animate-bounce">
+                POKEMONS MEMORY
+            </h1>
             <GlobalClicksProvider> {/* Envuelve GrupoTarjetas con GlobalClicksProvider */}
-                <TotalClicksCounter /> {/* Renderiza TotalClicksCounter dentro del proveedor de contexto */}
+                <div className="text-center mb-4">
+                    <TotalClicksCounter /> {/* Renderiza TotalClicksCounter dentro del proveedor de contexto */}
+                </div>
                 <GrupoTarjetas />
             </GlobalClicksProvider>
         </div>      

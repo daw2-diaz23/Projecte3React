@@ -103,7 +103,7 @@ export function GrupoTarjetas() {
     <div className="flex flex-col items-center">
       <div className="flex flex-col items-center mb-4">
         <p className="text-lg font-bold text-gray-700">Puntos acumulados: <span className="text-blue-500">{puntos}</span></p>
-        {juegoIniciado && !tiempoAgotado && <ContadorTiempo tiempoMaximo={20} onTiempoAgotado={handleTiempoAgotado} />}
+        {juegoIniciado && !tiempoAgotado && <ContadorTiempo tiempoMaximo={20} onTiempoAgotado={handleTiempoAgotado} juegoIniciado={juegoIniciado} />}
         {tiempoAgotado && <p className="text-red-500 text-lg font-semibold">¡Tiempo agotado!</p>}
       </div>
       <div className="flex flex-wrap justify-center gap-4">
