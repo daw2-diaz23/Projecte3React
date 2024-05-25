@@ -1,26 +1,28 @@
-import React, { useState, useEffect } from 'react';
+// ContadorTiempo.js
+import React, { useEffect, useState, useRef } from 'react';
 
 export function ContadorTiempo({ tiempoMaximo, onTiempoAgotado }) {
   const [tiempoRestante, setTiempoRestante] = useState(tiempoMaximo);
+  const timerRef = useRef(null);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setTiempoRestante(prevTiempoRestante => {
-        if (prevTiempoRestante === 0) {
-          clearInterval(intervalId);
+    timerRef.current = setInterval(() => {
+      setTiempoRestante(prevTiempo => {
+        if (prevTiempo <= 1) {
+          clearInterval(timerRef.current);
           onTiempoAgotado();
           return 0;
         }
-        return prevTiempoRestante - 1;
+        return prevTiempo - 1;
       });
     }, 1000);
 
-    return () => clearInterval(intervalId);
+    return () => clearInterval(timerRef.current);
   }, [onTiempoAgotado]);
 
   return (
     <div>
-      Tiempo restante: {tiempoRestante} segundos
+      <p>Tiempo restante: {tiempoRestante} segundos</p>
     </div>
   );
 }
