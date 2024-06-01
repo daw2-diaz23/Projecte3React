@@ -53,7 +53,7 @@ function Registro() {
         throw insertError; // Lanza un error si la inserción falla
       }
 
-      console.log('Datos insertados en la tabla:', insertData); // Muestra los datos insertados en la consola
+      
 
       localStorage.setItem('registroData', JSON.stringify(formData)); // Guarda los datos del formulario en localStorage
       
