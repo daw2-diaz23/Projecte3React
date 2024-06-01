@@ -1,4 +1,5 @@
 import { useState } from 'react'; 
+import { useNavigate } from 'react-router-dom'; // Importa el hook useNavigate
 import { supabase } from '../bd/supabase'; 
 
 function Registro() {
@@ -9,6 +10,7 @@ function Registro() {
   }); // Define el estado formData para manejar los datos del formulario
 
   const [error, setError] = useState(null); // Define el estado error para manejar los mensajes de error
+  const navigate = useNavigate(); // Obtiene la función navigate para la navegación
 
   const handleChange = (e) => {
     const { name, value } = e.target; // Obtiene el nombre y el valor del input
@@ -61,6 +63,9 @@ function Registro() {
         correo: '',
         password: ''
       }); // Resetea el formulario
+
+      // Redirigir a la página del juego después del registro
+      navigate('/juego'); // Ajusta la ruta según tu ruta deseada
     } catch (error) {
       console.error('Error registrando usuario:', error); // Muestra el error en la consola
       setError(error.message); // Establece el mensaje de error en el estado error
