@@ -5,7 +5,7 @@ import { AcercaDe } from './vistas/AcercaDe';
 import { Home } from './vistas/Home';
 import { Header } from './componentes/Header';
 import { Route, Routes } from 'react-router-dom';
-import Login from './vistas/Login'; // Comprova la ruta correcta
+import Login from './vistas/Login'; 
 import Registro  from './vistas/Registro';
 
 export default function App() {

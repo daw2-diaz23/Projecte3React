@@ -1,37 +1,42 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Registro = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({});
+  const [nombreUsuario, setNombreUsuario] = useState('');
+  const [correoElectronico, setCorreoElectronico] = useState('');
+  const [contrasena, setContrasena] = useState('');
+  const [errores, setErrores] = useState({});
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const manejarEnvio = (e) => {
     e.preventDefault();
-    const newErrors = {};
+    const nuevosErrores = {};
 
-    if (!username) {
-      newErrors.username = 'El nombre de usuario es obligatorio';
-    } else if (username.length < 3) {
-      newErrors.username = 'El nombre de usuario debe tener al menos 3 caracteres';
+    if (!nombreUsuario) {
+      nuevosErrores.nombreUsuario = 'El nombre de usuario es obligatorio';
+    } else if (nombreUsuario.length < 3) {
+      nuevosErrores.nombreUsuario = 'El nombre de usuario debe tener al menos 3 caracteres';
     }
 
-    if (!email) {
-      newErrors.email = 'El correo electrónico es obligatorio';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'El correo electrónico no es válido';
+    if (!correoElectronico) {
+      nuevosErrores.correoElectronico = 'El correo electrónico es obligatorio';
+    } else if (!/\S+@\S+\.\S+/.test(correoElectronico)) {
+      nuevosErrores.correoElectronico = 'El correo electrónico no es válido';
     }
 
-    if (!password) {
-      newErrors.password = 'La contraseña es obligatoria';
-    } else if (password.length < 6) {
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+    if (!contrasena) {
+      nuevosErrores.contrasena = 'La contraseña es obligatoria';
+    } else if (contrasena.length < 6) {
+      nuevosErrores.contrasena = 'La contraseña debe tener al menos 6 caracteres';
     }
 
-    setErrors(newErrors);
+    setErrores(nuevosErrores);
 
-    if (Object.keys(newErrors).length === 0) {
-      console.log('Registro:', { username, email, password });
+    if (Object.keys(nuevosErrores).length === 0) {
+      const datosUsuario = { nombreUsuario, correoElectronico, contrasena };
+      localStorage.setItem('datosUsuario', JSON.stringify(datosUsuario));
+      console.log('Registro guardado en localStorage:', datosUsuario);
+      navigate('/login');  // Redirige a la página de inicio de sesión
     }
   };
 
@@ -39,53 +44,53 @@ const Registro = () => {
     <div className="bg-white flex justify-center items-center min-h-screen">
       <div className="bg-white p-10 rounded-xl shadow-2xl w-full max-w-md" style={{ marginTop: '-5vh' }}>
         <h2 className="text-3xl font-extrabold mb-6 text-center text-gray-800">Registro</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={manejarEnvio} className="space-y-6">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">Nombre de usuario</label>
+            <label htmlFor="nombreUsuario" className="block text-sm font-medium text-gray-700">Nombre de usuario</label>
             <input
               type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              id="nombreUsuario"
+              value={nombreUsuario}
+              onChange={(e) => setNombreUsuario(e.target.value)}
               className={`mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none transition duration-300 ease-in-out ${
-                errors.username ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'
+                errores.nombreUsuario ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'
               }`}
               placeholder="Introduce tu nombre de usuario"
               required
               minLength="3"
             />
-            {errors.username && <p className="mt-2 text-sm text-red-600">{errors.username}</p>}
+            {errores.nombreUsuario && <p className="mt-2 text-sm text-red-600">{errores.nombreUsuario}</p>}
           </div>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Correo electrónico</label>
+            <label htmlFor="correoElectronico" className="block text-sm font-medium text-gray-700">Correo electrónico</label>
             <input
               type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="correoElectronico"
+              value={correoElectronico}
+              onChange={(e) => setCorreoElectronico(e.target.value)}
               className={`mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none transition duration-300 ease-in-out ${
-                errors.email ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'
+                errores.correoElectronico ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'
               }`}
               placeholder="Ej. usuario@ejemplo.com"
               required
             />
-            {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email}</p>}
+            {errores.correoElectronico && <p className="mt-2 text-sm text-red-600">{errores.correoElectronico}</p>}
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Contraseña</label>
+            <label htmlFor="contrasena" className="block text-sm font-medium text-gray-700">Contraseña</label>
             <input
               type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              id="contrasena"
+              value={contrasena}
+              onChange={(e) => setContrasena(e.target.value)}
               className={`mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none transition duration-300 ease-in-out ${
-                errors.password ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'
+                errores.contrasena ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'
               }`}
               placeholder="Introduce tu contraseña"
               required
               minLength="6"
             />
-            {errors.password && <p className="mt-2 text-sm text-red-600">{errors.password}</p>}
+            {errores.contrasena && <p className="mt-2 text-sm text-red-600">{errores.contrasena}</p>}
           </div>
           <button
             type="submit"
