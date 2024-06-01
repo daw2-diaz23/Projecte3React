@@ -1,107 +1,95 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react'; 
+import { supabase } from '../bd/supabase'; 
 
-const Registro = () => {
-  const [nombreUsuario, setNombreUsuario] = useState('');
-  const [correoElectronico, setCorreoElectronico] = useState('');
-  const [contrasena, setContrasena] = useState('');
-  const [errores, setErrores] = useState({});
-  const navigate = useNavigate();
+function Registro() {
+  const [formData, setFormData] = useState({
+    nombre: '',
+    correo: '',
+    password: ''
+  }); // Define el estado formData para manejar los datos del formulario
 
-  const manejarEnvio = (e) => {
-    e.preventDefault();
-    const nuevosErrores = {};
+  const [error, setError] = useState(null); // Define el estado error para manejar los mensajes de error
 
-    if (!nombreUsuario) {
-      nuevosErrores.nombreUsuario = 'El nombre de usuario es obligatorio';
-    } else if (nombreUsuario.length < 3) {
-      nuevosErrores.nombreUsuario = 'El nombre de usuario debe tener al menos 3 caracteres';
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target; // Obtiene el nombre y el valor del input
+    setFormData({
+      ...formData,
+      [name]: value
+    }); // Actualiza el estado formData con el nuevo valor del input
+  };
 
-    if (!correoElectronico) {
-      nuevosErrores.correoElectronico = 'El correo electrónico es obligatorio';
-    } else if (!/\S+@\S+\.\S+/.test(correoElectronico)) {
-      nuevosErrores.correoElectronico = 'El correo electrónico no es válido';
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Previene la recarga de la página al enviar el formulario
+    setError(null); // Resetea el estado de error
 
-    if (!contrasena) {
-      nuevosErrores.contrasena = 'La contraseña es obligatoria';
-    } else if (contrasena.length < 6) {
-      nuevosErrores.contrasena = 'La contraseña debe tener al menos 6 caracteres';
-    }
+    try {
+      // Registrar el usuario en Supabase 
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.correo,
+        password: formData.password,
+        options: {
+          data: {
+            nombre: formData.nombre
+          }
+        }
+      }); // Intenta registrar al usuario con los datos del formulario
 
-    setErrores(nuevosErrores);
+      if (error) {
+        throw error; // Lanza un error si el registro falla
+      }
 
-    if (Object.keys(nuevosErrores).length === 0) {
-      const datosUsuario = { nombreUsuario, correoElectronico, contrasena };
-      localStorage.setItem('datosUsuario', JSON.stringify(datosUsuario));
-      console.log('Registro guardado en localStorage:', datosUsuario);
-      navigate('/login');  // Redirige a la página de inicio de sesión
+      console.log('Usuario registrado:', data.user); // Muestra el usuario registrado en la consola
+
+      // Insertar los datos en la tabla personalizada, incluyendo la contraseña (no recomendado)
+      const { data: insertData, error: insertError } = await supabase
+        .from('perfiles')
+        .insert([
+          { nombre: formData.nombre, correo: formData.correo, password: formData.password }
+        ]); // Intenta insertar los datos del formulario en la tabla personalizada
+
+      if (insertError) {
+        throw insertError; // Lanza un error si la inserción falla
+      }
+
+      console.log('Datos insertados en la tabla:', insertData); // Muestra los datos insertados en la consola
+
+      localStorage.setItem('registroData', JSON.stringify(formData)); // Guarda los datos del formulario en localStorage
+      
+      // Limpiar los campos después de registrar
+      setFormData({
+        nombre: '',
+        correo: '',
+        password: ''
+      }); // Resetea el formulario
+    } catch (error) {
+      console.error('Error registrando usuario:', error); // Muestra el error en la consola
+      setError(error.message); // Establece el mensaje de error en el estado error
     }
   };
 
   return (
-    <div className="bg-white flex justify-center items-center min-h-screen">
-      <div className="bg-white p-10 rounded-xl shadow-2xl w-full max-w-md" style={{ marginTop: '-5vh' }}>
-        <h2 className="text-3xl font-extrabold mb-6 text-center text-gray-800">Registro</h2>
-        <form onSubmit={manejarEnvio} className="space-y-6">
-          <div>
-            <label htmlFor="nombreUsuario" className="block text-sm font-medium text-gray-700">Nombre de usuario</label>
-            <input
-              type="text"
-              id="nombreUsuario"
-              value={nombreUsuario}
-              onChange={(e) => setNombreUsuario(e.target.value)}
-              className={`mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none transition duration-300 ease-in-out ${
-                errores.nombreUsuario ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'
-              }`}
-              placeholder="Introduce tu nombre de usuario"
-              required
-              minLength="3"
-            />
-            {errores.nombreUsuario && <p className="mt-2 text-sm text-red-600">{errores.nombreUsuario}</p>}
+    <div className="flex items-center justify-center"> 
+      <div className="bg-white p-8 rounded shadow-md max-w-md w-full mt-20"> 
+        <h2 className="text-2xl font-semibold mb-6">Registrarse</h2> 
+        <form onSubmit={handleSubmit}> 
+          <div className="mb-4">
+            <label htmlFor="nombre" className="block text-gray-700 font-semibold mb-2">Nombre</label>
+            <input type="text" id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} className="border rounded w-full px-3 py-2" placeholder="Nombre" required /> 
           </div>
-          <div>
-            <label htmlFor="correoElectronico" className="block text-sm font-medium text-gray-700">Correo electrónico</label>
-            <input
-              type="email"
-              id="correoElectronico"
-              value={correoElectronico}
-              onChange={(e) => setCorreoElectronico(e.target.value)}
-              className={`mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none transition duration-300 ease-in-out ${
-                errores.correoElectronico ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'
-              }`}
-              placeholder="Ej. usuario@ejemplo.com"
-              required
-            />
-            {errores.correoElectronico && <p className="mt-2 text-sm text-red-600">{errores.correoElectronico}</p>}
+          <div className="mb-4">
+            <label htmlFor="correo" className="block text-gray-700 font-semibold mb-2">Correo electrónico</label> 
+            <input type="email" id="correo" name="correo" value={formData.correo} onChange={handleChange} className="border rounded w-full px-3 py-2" placeholder="Correo electrónico" required /> 
           </div>
-          <div>
-            <label htmlFor="contrasena" className="block text-sm font-medium text-gray-700">Contraseña</label>
-            <input
-              type="password"
-              id="contrasena"
-              value={contrasena}
-              onChange={(e) => setContrasena(e.target.value)}
-              className={`mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none transition duration-300 ease-in-out ${
-                errores.contrasena ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'
-              }`}
-              placeholder="Introduce tu contraseña"
-              required
-              minLength="6"
-            />
-            {errores.contrasena && <p className="mt-2 text-sm text-red-600">{errores.contrasena}</p>}
+          <div className="mb-6">
+            <label htmlFor="password" className="block text-gray-700 font-semibold mb-2">Contraseña</label> 
+            <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} className="border rounded w-full px-3 py-2" placeholder="Contraseña" required /> 
           </div>
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-2 px-4 rounded-lg hover:bg-gradient-to-l hover:from-blue-500 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-300 ease-in-out transform hover:scale-105"
-          >
-            Registrarse
-          </button>
+          {error && <div className="text-red-500 mb-4">{error}</div>} 
+          <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded w-full">Registrarse</button> 
         </form>
       </div>
     </div>
   );
-};
+}
 
-export default Registro;
+export default Registro; 
